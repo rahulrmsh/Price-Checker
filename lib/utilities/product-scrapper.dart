@@ -22,7 +22,6 @@ getAttendance(stringKey) async {
       smallList.addAll([spanList.text.trim(), priceList.text, imageURL]);
       finalList.add(smallList.join('+'));
     } catch (e) {
-      print(e);
       return (0);
     }
   }

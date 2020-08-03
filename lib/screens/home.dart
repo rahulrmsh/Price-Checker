@@ -1,8 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-// ignore: unused_import
-import 'package:price_checker/utilities/product-scrapper.dart';
 import 'package:price_checker/utilities/rootChecker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -97,7 +95,7 @@ class _HomeState extends State<Home> {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String stringValue = prefs.getString('stringValue');
-      String listValue = prefs.get('listValue');
+      String listValue = prefs.getString('listValue');
       List bigList = listValue.split('"');
       for (var i = 0; i < bigList.length; i++) {
         List smallList = [];
@@ -157,7 +155,7 @@ class _HomeState extends State<Home> {
                               borderSide: BorderSide(
                                   color: Colors.greenAccent[700], width: 2.0)),
                           border: InputBorder.none,
-                          labelText: "Link to be Added",
+                          labelText: "Link Here",
                           labelStyle: TextStyle(
                             color: Colors.black,
                           ),
