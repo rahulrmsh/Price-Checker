@@ -3,9 +3,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 rootChecker() async {
   try {
+    print('got rootChecker');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool boolValue = prefs.getBool('isReady');
-    if (boolValue != null && boolValue != false) {
+    var listInt = prefs.getInt('listInt');
+    print(boolValue);
+    if (listInt == null || listInt < 1) {
+      boolValue = false;
+    }
+    if (boolValue != null || boolValue != false) {
       String stringValue = prefs.getString('stringValue');
       getAttendance(stringValue);
     }

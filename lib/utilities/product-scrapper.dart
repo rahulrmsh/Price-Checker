@@ -8,7 +8,9 @@ getURL(stringKey) {
 }
 
 getAttendance(stringKey) async {
+  print('got inside getAttendance');
   var urlList = stringKey.toString().split('"');
+  print(urlList);
   List finalList = [];
   for (var i = 0; i < urlList.length; i++) {
     try {

@@ -1,18 +1,13 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_carousel_slider/carousel_slider.dart';
+import 'package:flutter_carousel_slider/carousel_slider_indicators.dart';
+import 'package:flutter_carousel_slider/carousel_slider_transforms.dart';
 import 'package:price_checker/utilities/rootChecker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool isReady = false;
-List<String> imgList = [
-  'https://images-na.ssl-images-amazon.com/images/I/51WKFjmQSKL._SL1196_.jpg',
-  'https://images-na.ssl-images-amazon.com/images/I/61R%2B5yDNShL._SY355_.jpg',
-  'https://images-na.ssl-images-amazon.com/images/I/61R%2B5yDNShL._SY355_.jpg',
-  'https://images-na.ssl-images-amazon.com/images/I/811u6QEwQxL._SL1500_.jpg',
-  'https://images-na.ssl-images-amazon.com/images/I/51vGmpKyULL._SL1000_.jpg',
-];
-List<String> imgList1 = [];
+List<String> imgList = [];
 
 class Home extends StatefulWidget {
   @override
@@ -22,47 +17,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _current = 0;
   String messageText;
-  final List<Widget> imageSliders = imgList
-      .map((item) => Container(
-            child: Container(
-              color: Colors.white,
-              child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  child: Stack(
-                    children: <Widget>[
-                      Image.network(item, fit: BoxFit.fitHeight, width: 1000.0),
-                      Positioned(
-                        bottom: 0.0,
-                        left: 0.0,
-                        right: 0.0,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Color.fromARGB(200, 0, 0, 0),
-                                Color.fromARGB(0, 0, 0, 0),
-                              ],
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                            ),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 20.0),
-                          child: Text(
-                            'Product ${imgList.indexOf(item) + 1}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )),
-            ),
-          ))
-      .toList();
   @override
   void initState() {
     super.initState();
@@ -73,11 +27,18 @@ class _HomeState extends State<Home> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     try {
       String stringValue = prefs.getString('stringValue');
+      var listInt = prefs.getInt('listInt');
       prefs.setString('stringValue', stringValue + '"' + stringKey);
-      prefs.setBool('isReady', true);
+      prefs.setInt('listInt', listInt + 1);
+      setState(() {
+        prefs.setBool('isReady', true);
+      });
     } catch (e) {
       prefs.setString('stringValue', stringKey);
-      prefs.setBool('isReady', true);
+      prefs.setInt('listInt', 1);
+      setState(() {
+        prefs.setBool('isReady', true);
+      });
     }
   }
 
@@ -96,21 +57,29 @@ class _HomeState extends State<Home> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String stringValue = prefs.getString('stringValue');
       String listValue = prefs.getString('listValue');
-      List bigList = listValue.split('"');
-      for (var i = 0; i < bigList.length; i++) {
-        List smallList = [];
-        smallList.add(bigList[i].toString().split('+'));
-        imgList1.add(smallList[0][2]);
-      }
-      print(imgList1);
-      if (stringValue != null) {
-        setState(() {
-          isReady = prefs.getBool('isReady');
-        });
-      } else {
-        setState(() {
-          isReady = false;
-        });
+      var listInt = prefs.getInt('listInt');
+      if (listValue != null && imgList.length < listInt) {
+        List bigList = listValue.split('"');
+        for (var i = 0; i < bigList.length; i++) {
+          if (imgList.length < listInt) {
+            List smallList = [];
+            smallList.add(bigList[i].toString().split('+'));
+            setState(() {
+              imgList.add(smallList[0][2]);
+            });
+          } else {
+            break;
+          }
+        }
+        if (stringValue != null) {
+          setState(() {
+            isReady = prefs.getBool('isReady');
+          });
+        } else {
+          setState(() {
+            isReady = false;
+          });
+        }
       }
     } catch (e) {
       print(e);
@@ -120,6 +89,7 @@ class _HomeState extends State<Home> {
     }
   }
 
+  GlobalKey<CarouselSliderState> _sliderKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     getReady();
@@ -234,17 +204,24 @@ class _HomeState extends State<Home> {
             SizedBox(
               height: 80,
             ),
-            CarouselSlider(
-              items: imageSliders,
-              options: CarouselOptions(
-                  autoPlay: true,
-                  enlargeCenterPage: true,
-                  aspectRatio: 2.0,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      _current = index;
-                    });
-                  }),
+            Container(
+              child: CarouselSlider.builder(
+                  key: _sliderKey,
+                  unlimitedMode: true,
+                  slideBuilder: (index) {
+                    return Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        'No. $index image',
+                        style: TextStyle(fontSize: 200, color: Colors.white),
+                      ),
+                    );
+                  },
+                  slideTransform: CubeTransform(),
+                  slideIndicator: CircularSlideIndicator(
+                    padding: EdgeInsets.only(bottom: 32),
+                  ),
+                  itemCount: imgList.length),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -265,25 +242,6 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(
               height: 80,
-            ),
-            FlatButton(
-              onPressed: () {
-                getURLData();
-              },
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.red[500],
-                    ),
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5.0),
-                child: Icon(
-                  Icons.add,
-                  size: 60,
-                  color: Colors.red[500],
-                ),
-              ),
             ),
           ]),
         ),
