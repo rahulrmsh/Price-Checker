@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 bool isReady = false;
 List<String> imgList = [];
+List<String> productList = [];
+List<String> priceList = [];
 
 class Home extends StatefulWidget {
   @override
@@ -15,7 +17,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int _current = 0;
   String messageText;
   @override
   void initState() {
@@ -60,12 +61,17 @@ class _HomeState extends State<Home> {
       var listInt = prefs.getInt('listInt');
       if (listValue != null && imgList.length < listInt) {
         List bigList = listValue.split('"');
+        imgList = [];
+        priceList = [];
+        productList = [];
         for (var i = 0; i < bigList.length; i++) {
           if (imgList.length < listInt) {
             List smallList = [];
             smallList.add(bigList[i].toString().split('+'));
             setState(() {
               imgList.add(smallList[0][2]);
+              priceList.add(smallList[0][1]);
+              productList.add(smallList[0][0]);
             });
           } else {
             break;
@@ -152,9 +158,7 @@ class _HomeState extends State<Home> {
         body: Center(
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            SizedBox(
-              height: 80,
-            ),
+            SizedBox(height: 80),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: AnimatedButton(
@@ -201,47 +205,64 @@ class _HomeState extends State<Home> {
                 },
               ),
             ),
-            SizedBox(
-              height: 80,
-            ),
             Container(
+              padding: EdgeInsets.all(20),
+              height: 500,
+              color: Colors.white,
+              width: double.infinity,
               child: CarouselSlider.builder(
                   key: _sliderKey,
                   unlimitedMode: true,
                   slideBuilder: (index) {
                     return Container(
-                      alignment: Alignment.center,
-                      child: Text(
-                        'No. $index image',
-                        style: TextStyle(fontSize: 200, color: Colors.white),
-                      ),
-                    );
+                        height: 300,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        color: Colors.transparent,
+                        child: Stack(
+                          children: <Widget>[
+                            Image(
+                              image: NetworkImage(imgList[index]),
+                              fit: BoxFit.fitWidth,
+                            ),
+                            Positioned(
+                              bottom: 0.0,
+                              left: 0.0,
+                              right: 0.0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color.fromARGB(200, 0, 0, 0),
+                                      Color.fromARGB(0, 0, 0, 0)
+                                    ],
+                                    begin: Alignment.bottomCenter,
+                                    end: Alignment.topCenter,
+                                  ),
+                                ),
+                                width: double.infinity,
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 10.0, horizontal: 20.0),
+                                child: Center(
+                                  child: Text(
+                                    productList[index] + " " + priceList[index],
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ));
                   },
                   slideTransform: CubeTransform(),
                   slideIndicator: CircularSlideIndicator(
                     padding: EdgeInsets.only(bottom: 32),
                   ),
                   itemCount: imgList.length),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: imgList.map((url) {
-                int index = imgList.indexOf(url);
-                return Container(
-                  width: 8.0,
-                  height: 8.0,
-                  margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _current == index
-                        ? Color.fromRGBO(0, 0, 0, 0.9)
-                        : Color.fromRGBO(0, 0, 0, 0.4),
-                  ),
-                );
-              }).toList(),
-            ),
-            SizedBox(
-              height: 80,
             ),
           ]),
         ),
