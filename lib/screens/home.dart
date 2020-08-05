@@ -58,7 +58,8 @@ class _HomeState extends State<Home> {
       String stringValue = prefs.getString('stringValue');
       String listValue = prefs.getString('listValue');
       var listInt = prefs.getInt('listInt');
-      var strList = stringValue.toString().split('"');
+      var strList = stringValue.split('"');
+      print("URL NOW IS" + strList[1]);
       if (listValue != null && imgList.length < listInt) {
         List bigList = listValue.split('"');
         imgList = [];
@@ -72,7 +73,7 @@ class _HomeState extends State<Home> {
             List smallList = [];
             smallList.add(bigList[i].toString().split('+'));
             setState(() {
-              urlList.add(strList[i]);
+              urlList.add(strList[i + 1]);
               imgList.add(smallList[0][2]);
               priceList.add(smallList[0][1]);
               productList.add(smallList[0][0]);
