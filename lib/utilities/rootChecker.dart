@@ -7,13 +7,16 @@ rootChecker() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool boolValue = prefs.getBool('isReady');
     var listInt = prefs.getInt('listInt');
+    print(listInt);
     print(boolValue);
-    if (listInt == null || listInt < 1) {
+    if (listInt == null) {
       boolValue = false;
     }
-    if (boolValue != null || boolValue != false) {
-      String stringValue = prefs.getString('stringValue');
-      getAttendance(stringValue);
+    if (boolValue != null) {
+      if (boolValue != false) {
+        String stringValue = prefs.getString('stringValue');
+        getAttendance(stringValue);
+      }
     }
   } catch (e) {
     print(e);

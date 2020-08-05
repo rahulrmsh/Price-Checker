@@ -28,30 +28,27 @@ class _HomeState extends State<Home> {
 
   setURLData(stringKey) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    try {
-      String stringValue = prefs.getString('stringValue');
-      var listInt = prefs.getInt('listInt');
-      prefs.setString('stringValue', stringValue + '"' + stringKey);
-      prefs.setInt('listInt', listInt + 1);
-      setState(() {
-        prefs.setBool('isReady', true);
-      });
-    } catch (e) {
-      prefs.setString('stringValue', stringKey);
-      prefs.setInt('listInt', 1);
-      setState(() {
-        prefs.setBool('isReady', true);
-      });
-    }
-  }
-
-  getURLData() async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String stringValue = prefs.getString('stringValue');
-      print(stringValue);
-    } catch (e) {
-      print(e);
+    if (stringKey != null && stringKey != '') {
+      try {
+        String stringValue = prefs.getString('stringValue');
+        var initialList = stringValue.split('"');
+        if (!(initialList.contains(stringKey))) {
+          var listInt = prefs.getInt('listInt');
+          setState(() {
+            prefs.setString('stringValue', stringValue + '"' + stringKey);
+            prefs.setInt('listInt', listInt + 1);
+            prefs.setBool('isReady', true);
+            rootChecker();
+          });
+        }
+      } catch (e) {
+        setState(() {
+          prefs.setString('stringValue', stringKey);
+          prefs.setInt('listInt', 1);
+          prefs.setBool('isReady', true);
+          rootChecker();
+        });
+      }
     }
   }
 
@@ -68,7 +65,10 @@ class _HomeState extends State<Home> {
         priceList = [];
         productList = [];
         for (var i = 0; i < bigList.length; i++) {
-          if (imgList.length < listInt) {
+          if (imgList.length <= listInt &&
+              urlList.length <= listInt &&
+              priceList.length <= listInt &&
+              productList.length <= listInt) {
             List smallList = [];
             smallList.add(bigList[i].toString().split('+'));
             setState(() {
@@ -80,8 +80,12 @@ class _HomeState extends State<Home> {
           } else {
             break;
           }
+          print("URL LIST : " +
+              urlList.toString() +
+              "IMG LIST" +
+              imgList.toString());
         }
-        if (stringValue != null) {
+        if (listInt > 0) {
           setState(() {
             isReady = prefs.getBool('isReady');
           });
@@ -147,7 +151,9 @@ class _HomeState extends State<Home> {
                   title: 'This is Ignored',
                   desc: 'This is also Ignored',
                   btnOkOnPress: () {
-                    setURLData(messageText);
+                    setState(() {
+                      setURLData(messageText);
+                    });
                   },
                 )..show();
               },
