@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_carousel_slider/carousel_slider.dart';
 import 'package:flutter_carousel_slider/carousel_slider_indicators.dart';
 import 'package:flutter_carousel_slider/carousel_slider_transforms.dart';
+import 'package:price_checker/utilities/removeURL.dart';
 import 'package:price_checker/utilities/rootChecker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,6 +11,7 @@ bool isReady = false;
 List<String> imgList = [];
 List<String> productList = [];
 List<String> priceList = [];
+List<String> urlList = [];
 
 class Home extends StatefulWidget {
   @override
@@ -59,6 +61,7 @@ class _HomeState extends State<Home> {
       String stringValue = prefs.getString('stringValue');
       String listValue = prefs.getString('listValue');
       var listInt = prefs.getInt('listInt');
+      var strList = stringValue.toString().split('"');
       if (listValue != null && imgList.length < listInt) {
         List bigList = listValue.split('"');
         imgList = [];
@@ -69,6 +72,7 @@ class _HomeState extends State<Home> {
             List smallList = [];
             smallList.add(bigList[i].toString().split('+'));
             setState(() {
+              urlList.add(strList[i]);
               imgList.add(smallList[0][2]);
               priceList.add(smallList[0][1]);
               productList.add(smallList[0][0]);
@@ -214,49 +218,58 @@ class _HomeState extends State<Home> {
                   key: _sliderKey,
                   unlimitedMode: true,
                   slideBuilder: (index) {
-                    return Container(
-                        height: 300,
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        color: Colors.transparent,
-                        child: Stack(
-                          children: <Widget>[
-                            Image(
-                              image: NetworkImage(imgList[index]),
-                              fit: BoxFit.fitWidth,
-                            ),
-                            Positioned(
-                              bottom: 0.0,
-                              left: 0.0,
-                              right: 0.0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Color.fromARGB(200, 0, 0, 0),
-                                      Color.fromARGB(0, 0, 0, 0)
-                                    ],
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
+                    return FlatButton(
+                      onPressed: () {
+                        setState(() {
+                          removeURL(urlList[index]);
+                        });
+                      },
+                      child: Container(
+                          height: 300,
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          color: Colors.transparent,
+                          child: Stack(
+                            children: <Widget>[
+                              Image(
+                                image: NetworkImage(imgList[index]),
+                                fit: BoxFit.fitWidth,
+                              ),
+                              Positioned(
+                                bottom: 0.0,
+                                left: 0.0,
+                                right: 0.0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color.fromARGB(200, 0, 0, 0),
+                                        Color.fromARGB(0, 0, 0, 0)
+                                      ],
+                                      begin: Alignment.bottomCenter,
+                                      end: Alignment.topCenter,
+                                    ),
                                   ),
-                                ),
-                                width: double.infinity,
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 10.0, horizontal: 20.0),
-                                child: Center(
-                                  child: Text(
-                                    productList[index] + " " + priceList[index],
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
+                                  width: double.infinity,
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 10.0, horizontal: 20.0),
+                                  child: Center(
+                                    child: Text(
+                                      productList[index] +
+                                          " " +
+                                          priceList[index],
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ));
+                            ],
+                          )),
+                    );
                   },
                   slideTransform: CubeTransform(),
                   slideIndicator: CircularSlideIndicator(
