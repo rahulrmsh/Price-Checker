@@ -266,9 +266,9 @@ class _HomeState extends State<Home> {
                                   child: Center(
                                     child: Text(
                                       productList[index] +
-                                          " " +
+                                          " \n" +
                                           priceList[index] +
-                                          "" +
+                                          " \n" +
                                           rateList[index],
                                       style: TextStyle(
                                         color: Colors.white,
