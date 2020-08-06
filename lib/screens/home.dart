@@ -12,6 +12,7 @@ List<String> imgList = [];
 List<String> productList = [];
 List<String> priceList = [];
 List<String> urlList = [];
+List<String> rateList = [];
 
 class Home extends StatefulWidget {
   @override
@@ -65,6 +66,7 @@ class _HomeState extends State<Home> {
         imgList = [];
         priceList = [];
         productList = [];
+        rateList = [];
         for (var i = 0; i < bigList.length; i++) {
           if (imgList.length <= listInt &&
               urlList.length <= listInt &&
@@ -74,6 +76,7 @@ class _HomeState extends State<Home> {
             smallList.add(bigList[i].toString().split('+'));
             setState(() {
               urlList.add(strList[i + 1]);
+              rateList.add(smallList[0][3]);
               imgList.add(smallList[0][2]);
               priceList.add(smallList[0][1]);
               productList.add(smallList[0][0]);
@@ -264,7 +267,9 @@ class _HomeState extends State<Home> {
                                     child: Text(
                                       productList[index] +
                                           " " +
-                                          priceList[index],
+                                          priceList[index] +
+                                          "" +
+                                          rateList[index],
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 18.0,
